@@ -47,16 +47,15 @@ void show(List Q){
     if (head(Q) == NULL && tail(Q) == NULL){
         cout << "Queue Kosong\n";
     } else {
-        cout << left << setw(9) << "Job" << setw(11) << "Burst Time" << setw(13) << "Waiting Time" << setw(13) << "Arround Time\n";
+        cout << left << setw(9) << "Job" << "| " <<setw(11) << "Burst Time" << "| " <<setw(13) << "Waiting Time" << "| " <<setw(13) << "Arround Time\n";
         while (q != NULL){
             cout << setw(9) << info(q).name
-            << setw(11) << info(q).burstTime
-            << setw(13) << info(q).waitingTime
-            << setw(13) << info(q).arroundTime << " \n";
+            << "| " <<setw(11) << info(q).burstTime
+            << "| " <<setw(13) << info(q).waitingTime
+            << "| " <<setw(13) << info(q).arroundTime << " \n";
             q = next(q);
         }
     }
-    cout << endl;
 }
 
 void printJob(adr P){
@@ -66,12 +65,21 @@ void printJob(adr P){
    << endl;
 }
 
-void firstTimeFirstServe(List &Q1, List &Q2, List &Q3, int quantum, int prioritas, int n){
-    int t; 
-    float AWT, ATAT;
+void AverageWT(float &x, int n){
+    x = x/n;
+}
+
+void AverageTAT(float &y, int n){
+    y = y/n;
+}
+
+List firstTimeFirstServe(List &Q1, List &Q2, List &Q3, int quantum, int prioritas, float &nWT, float &nTAT){
+    int t;
     adr temp, P;
+    List Qtemp;
+    createQueue(Qtemp);
     while (!isEmpty(Q1)){
-        cout << "\n=================================================\n";
+        cout << "\n====================================================\n";
         dequeue(Q1, temp);
         printJob(temp);
         cout << "Quantum   : " << quantum << endl;
@@ -123,12 +131,14 @@ void firstTimeFirstServe(List &Q1, List &Q2, List &Q3, int quantum, int priorita
         if (info(temp).burstTime > 0) {
             enqueue(Q1,temp);
         } else {
-            ATAT += info(temp).arroundTime;
-            AWT += info(temp).waitingTime;
+            info(temp).burstTime = 0;
+            nTAT += info(temp).arroundTime;
+            nWT += info(temp).waitingTime;
             cout
             << "\nJob          : " << info(temp).name
             << "\nWaiting Time : " << info(temp).waitingTime
             << "\nArround Time : " << info(temp).arroundTime << endl;
+            enqueue(Qtemp, temp);
         }
         
 
@@ -144,23 +154,23 @@ void firstTimeFirstServe(List &Q1, List &Q2, List &Q3, int quantum, int priorita
             }
         }
     }
-    cout << "\n=================================================\n";
-    cout << n << endl;
-    cout << "AWT: " << float(AWT/n) << endl;
-    cout << "ATAT: " << float(ATAT/n) << endl;
+    cout << "\n====================================================\n";
+    return Qtemp;
 }
 
 int menu(){
     int i;
     cout 
-    << "=======================MENU======================\n"
+    << "========================MENU========================\n"
     << "1. Masukan queue proses\n"
     << "2. Menampilkan Data\n"
     << "3. Execute\n"
-    << "4. Done\n"
-    << "=================================================\n"
+    << "4. Menampilkan Rata - Rata WT dan TAT\n"
+    << "5. Menampilkan List Kegiatan Setelah Eksekusi\n"
+    << "6. Done\n"
+    << "====================================================\n"
     << "Pilih: ";
     cin >> i;
-    cout << "=================================================\n";
+    cout << "====================================================\n";
     return i;
 }
