@@ -1,16 +1,18 @@
 #include "tubesh.h"
 int main(){
-    List Q1,Q2,Q3;
+    List Q1,Q2,Q3,Q4;
     int i, j, k, Quantum, prioritas, t, n;
+    float ATAT, AWT;
     infotype x;
     adr P;
 
     createQueue(Q1);
     createQueue(Q2);
     createQueue(Q3);
+    createQueue(Q4);
 
     i = menu();
-    while(i != 4){
+    while(i != 6){
         switch (i){
         case 1:
             cout << "Queue Prioritas Tinggi\n";
@@ -68,26 +70,37 @@ int main(){
         case 2:
             cout << "Menampilkan Queue Prioritas Tinggi\n\n";
             show(Q1);
-            cout << "Menampilkan Queue Prioritas Sedang\n\n";
+            cout << "\nMenampilkan Queue Prioritas Sedang\n\n";
             show(Q2);
-            cout << "Menampilkan Queue Prioritas Rendah\n\n";
+            cout << "\nMenampilkan Queue Prioritas Rendah\n\n";
             show(Q3);
             break;
         case 3:
             if (isEmpty(Q1)){
-                cout << "TIDAK ADA QUEUE UNTUK DIEKSEKUSI\n";
+                cout << "\nTIDAK ADA QUEUE UNTUK DIEKSEKUSI\n";
             } else {
                 cout << "Quantum : ";
                 cin >> Quantum;
                 cout << "PrioUp  : ";
                 cin >> prioritas;
-                cout << "\n...................MENGEKSEKUSI..................\n";
-                firstTimeFirstServe(Q1, Q2, Q3, Quantum, prioritas, n);
+                cout << "...................MENGEKSEKUSI..................";
+                Q4 = firstTimeFirstServe(Q1, Q2, Q3, Quantum, prioritas, AWT, ATAT);
             }
-            cout << "\n.....................SELESAI.....................\n";
+            cout << ".....................SELESAI.....................\n";
+            break;
+        case 4:
+            AverageWT(AWT,n);
+            AverageTAT(ATAT,n);
+            cout << "Rata-Rata Waiting Time Dan Turn Arround Time\n"
+            << "AWT: " << AWT
+            << "\nATAT: " << ATAT <<"\n";
+            break;
+        case 5:
+            show(Q4);
             break;
         }
+        cout << "====================================================\n\n\n";
         i = menu();
     }
-    cout << "\nPROGRAM TELAH BERHENTI\n\n";
+    cout << "PROGRAM TELAH BERHENTI\n\n";
 }
