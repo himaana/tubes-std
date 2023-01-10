@@ -1,4 +1,4 @@
-#include "tubesh.h"
+#include "tubes.h"
 int main(){
     List Q1,Q2,Q3,Q4;
     int i, j, k, Quantum, prioritas, t, n;
