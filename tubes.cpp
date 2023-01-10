@@ -1,7 +1,6 @@
-#include "tubesh.h"
+#include "tubes.h"
 void createQueue(List &Q){
     head(Q) = NULL;
-    tail(Q) = NULL;
 }
 
 void createElement(infotype x, adr &P){
@@ -16,14 +15,12 @@ void createElement(infotype x, adr &P){
 void enqueue(List &Q, adr P){
     if (head(Q) == NULL){
         head(Q) = P;
-        tail(Q) = P;
     } else {
         adr q = head(Q);
         while (next(q) != NULL){
             q = next(q);
         }
         next(q) = P;
-        tail(Q) = P;
     }
 }
 
@@ -31,20 +28,19 @@ void dequeue(List &Q, adr &P){
     P = head(Q);
     if (head(Q) == NULL){
         cout << "Kosong\n";
-    } else if(head(Q) == tail(Q)){
+    } else if (next(head(Q)) == NULL) {
         head(Q) = NULL;
-        tail(Q) = NULL;
     } else {
         head(Q) = next(head(Q));
         next(P) = NULL;
     }
 }
 bool isEmpty(List Q){
-    return head(Q) == NULL && tail(Q) == NULL;
+    return head(Q) == NULL;
 }
 void show(List Q){
     adr q = head(Q);
-    if (head(Q) == NULL && tail(Q) == NULL){
+    if (head(Q) == NULL){
         cout << "Queue Kosong\n";
     } else {
         cout << left << setw(9) << "Job" << "| " <<setw(11) << "Burst Time" << "| " <<setw(13) << "Waiting Time" << "| " <<setw(13) << "Arround Time\n";
@@ -73,6 +69,21 @@ void AverageTAT(float &y, int n){
     y = y/n;
 }
 
+void updateWTTAT(List &Q, adr temp, int quantum){
+    adr P = head(Q);
+    while (P != NULL){
+        if (info(temp).burstTime <= quantum){
+            info(P).waitingTime += info(temp).burstTime;
+            info(P).arroundTime += info(temp).burstTime;
+        } else if (info(temp).burstTime > quantum){
+            info(P).waitingTime += quantum;
+            info(P).arroundTime += quantum;
+        }
+        P = next(P);
+    }
+}
+
+
 List firstTimeFirstServe(List &Q1, List &Q2, List &Q3, int quantum, int prioritas, float &nWT, float &nTAT){
     int t;
     adr temp, P;
@@ -83,47 +94,18 @@ List firstTimeFirstServe(List &Q1, List &Q2, List &Q3, int quantum, int priorita
         dequeue(Q1, temp);
         printJob(temp);
         cout << "Quantum   : " << quantum << endl;
-        P = head(Q1);
-        while (P != NULL){
-            if (info(temp).burstTime <= quantum){
-                info(P).waitingTime += info(temp).burstTime;
-                info(P).arroundTime += info(temp).burstTime;
-            } else if (info(temp).burstTime > quantum){
-                info(P).waitingTime += quantum;
-                info(P).arroundTime += quantum;
-            }
-            P = next(P);
-        }
-        P = head(Q2);
-        while (P != NULL){
-            if (info(temp).burstTime <= quantum){
-                info(P).waitingTime += info(temp).burstTime;
-                info(P).arroundTime += info(temp).burstTime;
-            } else if (info(temp).burstTime > quantum){
-                info(P).waitingTime += quantum;
-                info(P).arroundTime += quantum;
-            }
-            P = next(P);
-        }
-        P = head(Q3);
-        while (P != NULL){
-            if (info(temp).burstTime <= quantum){
-                info(P).waitingTime += info(temp).burstTime;
-                info(P).arroundTime += info(temp).burstTime;
-            } else if (info(temp).burstTime > quantum){
-                info(P).waitingTime += quantum;
-                info(P).arroundTime += quantum;
-            }
-            P = next(P);
-        }
+
         if (info(temp).burstTime <= quantum){
-            t += info(temp).burstTime;
             info(temp).arroundTime += info(temp).burstTime;
+            t += info(temp).burstTime;
         } else if (info(temp).burstTime > quantum){
-            t += quantum;
             info(temp).arroundTime += quantum;
+            t += quantum;
         }
         
+        updateWTTAT(Q1,temp,quantum);
+        updateWTTAT(Q2,temp,quantum);
+        updateWTTAT(Q3,temp,quantum);
 
         show(Q1);
 
