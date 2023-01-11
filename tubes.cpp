@@ -56,9 +56,10 @@ void show(List Q){
 
 void printJob(adr P){
     cout
-    << "\nJob       : " << info(P).name
-    << "\nBurstTime : " << info(P).burstTime
-   << endl;
+    << "\nJob          : " << info(P).name
+    << "\nBurst Time   : " << info(P).burstTime
+    << "\nWaiting Time : " << info(P).waitingTime
+    << "\nArround Time : " << info(P).arroundTime << endl;
 }
 
 void AverageWT(float &x, int n){
@@ -69,16 +70,11 @@ void AverageTAT(float &y, int n){
     y = y/n;
 }
 
-void updateWTTAT(List &Q, adr temp, int quantum){
+void updateWTTAT(List &Q, adr temp, int i){
     adr P = head(Q);
     while (P != NULL){
-        if (info(temp).burstTime <= quantum){
-            info(P).waitingTime += info(temp).burstTime;
-            info(P).arroundTime += info(temp).burstTime;
-        } else if (info(temp).burstTime > quantum){
-            info(P).waitingTime += quantum;
-            info(P).arroundTime += quantum;
-        }
+        info(P).waitingTime += i;
+        info(P).arroundTime += i;
         P = next(P);
     }
 }
@@ -97,33 +93,32 @@ List firstTimeFirstServe(List &Q1, List &Q2, List &Q3, int quantum, int priorita
 
         if (info(temp).burstTime <= quantum){
             info(temp).arroundTime += info(temp).burstTime;
+            updateWTTAT(Q1,temp,info(temp).burstTime);
+            updateWTTAT(Q2,temp,info(temp).burstTime);
+            updateWTTAT(Q3,temp,info(temp).burstTime);
             t += info(temp).burstTime;
+            info(temp).burstTime -= quantum;
         } else if (info(temp).burstTime > quantum){
             info(temp).arroundTime += quantum;
+            updateWTTAT(Q1,temp,quantum);
+            updateWTTAT(Q2,temp,quantum);
+            updateWTTAT(Q3,temp,quantum);
+            info(temp).burstTime -= quantum;
             t += quantum;
         }
         
-        updateWTTAT(Q1,temp,quantum);
-        updateWTTAT(Q2,temp,quantum);
-        updateWTTAT(Q3,temp,quantum);
-
         show(Q1);
 
-        info(temp).burstTime -= quantum;
         if (info(temp).burstTime > 0) {
             enqueue(Q1,temp);
         } else {
             info(temp).burstTime = 0;
             nTAT += info(temp).arroundTime;
             nWT += info(temp).waitingTime;
-            cout
-            << "\nJob          : " << info(temp).name
-            << "\nWaiting Time : " << info(temp).waitingTime
-            << "\nArround Time : " << info(temp).arroundTime << endl;
+            printJob(temp);
             enqueue(Qtemp, temp);
         }
         
-
         if (t%prioritas == 0){
             while (!isEmpty(Q2)){
                 dequeue(Q2, temp);
